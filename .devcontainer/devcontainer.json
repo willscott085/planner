@@ -24,7 +24,8 @@
 			"extensions": [
 				"yoavbls.pretty-ts-errors",
 				"vdanchenkov.tailwind-class-sorter",
-				"bradlc.vscode-tailwindcss"
+				"bradlc.vscode-tailwindcss",
+				"esbenp.prettier-vscode"
 			]
 		}
 	}
