@@ -25,7 +25,9 @@
 				"yoavbls.pretty-ts-errors",
 				"vdanchenkov.tailwind-class-sorter",
 				"bradlc.vscode-tailwindcss",
-				"esbenp.prettier-vscode"
+				"esbenp.prettier-vscode",
+				"planbcoding.vscode-react-refactor",
+				"bierner.folder-source-actions"
 			]
 		}
 	}
