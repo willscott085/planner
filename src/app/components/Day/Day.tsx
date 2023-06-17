@@ -7,21 +7,23 @@ interface Props {
   isPadding: boolean;
   dateString: string;
   isToday: boolean;
+  isSelected: boolean;
   onDayClick: (dateString: string) => void;
   children: React.ReactNode;
 }
 
 function Day(props: Props) {
-  const { isPadding, isToday, dateString, onDayClick, children } = props;
+  const { isPadding, isToday, isSelected, dateString, onDayClick, children } =
+    props;
 
   return (
     <button
       className={clsx(
-        'flex rounded-full justify-center items-center transition-colors ease-in duration-250 aspect-square',
+        'flex rounded-full justify-center items-center transition-colors ease-in duration-250 aspect-square hover:shadow-2',
         {
           'text-neutral-500': isPadding,
           'bg-blue-600': isToday,
-          'hover:bg-neutral-400': !isToday,
+          'bg-neutral-400': isSelected && !isToday,
         }
       )}
       onClick={() => onDayClick(dateString)}

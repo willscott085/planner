@@ -9,12 +9,19 @@ import React, { useEffect, useState } from 'react';
 import { Day } from '@/app/components/Day';
 import { Fragment } from 'react';
 import getWeek from 'date-fns/getWeek';
+import parse from 'date-fns/parse';
+import add from 'date-fns/add';
+import sub from 'date-fns/sub';
+import { ChevronLeft } from '../icons/ChevronLeft';
+import { ChevronRight } from '../icons/ChevronRight';
 
 type DayOptions = {
   dateString: string;
   isToday: boolean;
   isPadding: boolean;
 };
+
+type Day = [number, DayOptions];
 
 export function createMonthIterable(
   year: number,
@@ -27,8 +34,7 @@ export function createMonthIterable(
   const length = rows * cols;
   let currentRow = 0;
   let currentCol = 0;
-  // const matrix: [[number, DayOptions]][] = new Array(rows).fill([]);
-  const matrix: [[number, DayOptions]][] = [[], [], [], [], [], []];
+  const matrix: Day[][] = Array.from({ length: rows }).map((_) => []);
 
   Array.from({ length })
     .map((_, index) => addDays(startDate, index))
@@ -56,8 +62,11 @@ export function createMonthIterable(
 
 export function DailyPlanner() {
   const [selectedDate, setSelectedDate] = useState(new Date().toDateString());
-  const [formattedDate, setFormattedDate] = useState(
-    format(new Date(selectedDate), 'eeee, d LLLL yyyy', { weekStartsOn: 1 })
+  const [formattedDay, setFormattedDay] = useState(
+    format(new Date(selectedDate), 'eeee')
+  );
+  const [formattedMonthYear, setFormattedMonthYear] = useState(
+    format(new Date(selectedDate), 'MM yyyy')
   );
   const monthIterable = createMonthIterable(
     new Date(selectedDate).getFullYear(),
@@ -66,6 +75,30 @@ export function DailyPlanner() {
 
   const handleDayClick = (dateString: string) => {
     setSelectedDate(new Date(dateString).toDateString());
+  };
+
+  const handleNextDayClick = () => {
+    setSelectedDate((ds) => add(new Date(ds), { days: 1 }).toDateString());
+  };
+
+  const handlePreviousDayClick = () => {
+    setSelectedDate((ds) => sub(new Date(ds), { days: 1 }).toDateString());
+  };
+
+  const handlePlannerKeyDown = (evt: KeyboardEvent) => {
+    if (evt.key === 'ArrowUp') {
+      setSelectedDate((ds) => sub(new Date(ds), { days: 7 }).toDateString());
+    } else if (evt.key === 'ArrowRight') {
+      setSelectedDate((ds) => add(new Date(ds), { days: 1 }).toDateString());
+    } else if (evt.key === 'ArrowDown') {
+      setSelectedDate((ds) => add(new Date(ds), { days: 7 }).toDateString());
+    } else if (evt.key === 'ArrowLeft') {
+      setSelectedDate((ds) => sub(new Date(ds), { days: 1 }).toDateString());
+    }
+  };
+
+  const isSelected = (dateString: string) => {
+    return dateString === selectedDate;
   };
 
   useEffect(() => {
@@ -79,21 +112,50 @@ export function DailyPlanner() {
       const isNextWeek = currentWeekNumber + 1 === selectedWeekNumber;
 
       if (isCurrentWeek) {
-        setFormattedDate(format(new Date(selectedDate), 'eeee'));
+        setFormattedDay(format(new Date(selectedDate), 'eeee'));
       } else if (isPreviousWeek) {
-        setFormattedDate('Last week ' + format(new Date(selectedDate), 'eeee'));
+        setFormattedDay('Last Week ' + format(new Date(selectedDate), 'eeee'));
       } else if (isNextWeek) {
-        setFormattedDate('Next week ' + format(new Date(selectedDate), 'eeee'));
+        setFormattedDay('Next ' + format(new Date(selectedDate), 'eeee'));
       } else {
-        setFormattedDate(format(new Date(selectedDate), 'eeee, d LLLL yyyy'));
+        setFormattedDay(format(new Date(selectedDate), 'eeee, d LLLL yyyy'));
       }
+
+      setFormattedMonthYear(format(new Date(selectedDate), 'MMMM, yyyy'));
     }
   }, [selectedDate]);
 
+  useEffect(() => {
+    document.addEventListener('keydown', handlePlannerKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handlePlannerKeyDown);
+    };
+  }, []);
+
   return (
-    <>
-      <section className="flex-grow">{formattedDate}</section>
+    <main className="flex flex-col sm:flex-row">
+      <section className="flex-grow">
+        <h1 className="py-4">{formattedDay}</h1>
+      </section>
       <section className="w-full max-w-md">
+        <div className="flex justify-between items-center">
+          <h2 className="py-4">{formattedMonthYear}</h2>
+          <div className="flex justify-between gap-4">
+            <button
+              onClick={handlePreviousDayClick}
+              className="hover:shadow-2 rounded-full p-3"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={handleNextDayClick}
+              className="hover:shadow-2 rounded-full p-3"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
         <div className="grid grid-cols-7">
           {monthIterable.map((week, idx) => (
             <Fragment key={idx}>
@@ -102,6 +164,7 @@ export function DailyPlanner() {
                   key={day}
                   isPadding={opts.isPadding}
                   isToday={opts.isToday}
+                  isSelected={isSelected(opts.dateString)}
                   dateString={opts.dateString}
                   onDayClick={handleDayClick}
                 >
@@ -112,7 +175,7 @@ export function DailyPlanner() {
           ))}
         </div>
       </section>
-    </>
+    </main>
   );
 }
 
