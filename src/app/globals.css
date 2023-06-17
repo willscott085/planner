@@ -2,19 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-color: #27272a;
-  --background-color: white;
-}
+@layer reset, theme, global, layout, components, utilities, states;
 
-@media (prefers-color-scheme: dark) {
+@layer theme {
   :root {
-    --foreground-color: white;
-    --background-color: #27272a;
+    /* Color styles */
+    --primary: hsl(265, 38%, 13%);
+    --secondary: hsl(283, 6%, 45%);
+    --tertiary: hsl(257, 15%, 91%);
+    --light: hsl(270, 100%, 99%);
+    --accent: hsl(278, 100%, 92%);
+    --accent--alt: hsl(279, 100%, 97%);
+    --accent--ui: hsl(284, 55%, 66%);
   }
 }
 
-body {
-  color: var(--foreground-color);
-  background: var(--background-color);
+@layer global {
+  :root {
+    --foreground-color: #27272a;
+    --background-color: white;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --foreground-color: white;
+      --background-color: #27272a;
+    }
+  }
+
+  body {
+    color: var(--foreground-color);
+    background: var(--background-color);
+  }
+}
+
+@layer theme {
+  html {
+    color-scheme: dark;
+    accent-color: var(--accent--ui);
+  }
+}
+
+@layer reset {
+  /* Baseline for default links */
+  a:not([class]) {
+    text-decoration-thickness: max(0.08em, 1px);
+    text-underline-offset: 0.15em;
+  }
+
+  /* visible focus styles will be attached to only the 
+    :focus-visible state */
+  :focus-visible {
+    --outline-size: max(2px, 0.15em);
+
+    outline: var(--outline-width, var(--outline-size))
+      var(--outline-style, solid) var(--outline-color, currentColor);
+    outline-offset: var(--outline-offset, var(--outline-size));
+  }
+
+  /* Scroll padding allowance above anchor links */
+  :target {
+    scroll-padding-block-start: 2rem;
+  }
+
+  /* Scroll padding allowance below focused elements 
+    to ensure they are clearly in view */
+  :focus {
+    scroll-padding-block-end: 8vh;
+  }
+}
+
+@layer layout {
+  .layout-grid {
+    --layout-grid-min: 30ch;
+    --layout-grid-gap: 3vw;
+
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--layout-grid-min)), 1fr)
+    );
+    gap: var(--layout-grid-gap);
+  }
 }

@@ -17,7 +17,7 @@ function Day(props: Props) {
   return (
     <button
       className={clsx(
-        'flex w-10 h-10 rounded-full justify-center items-center transition-colors ease-in duration-250',
+        'flex rounded-full justify-center items-center transition-colors ease-in duration-250 aspect-square',
         {
           'text-neutral-500': isPadding,
           'bg-blue-600': isToday,

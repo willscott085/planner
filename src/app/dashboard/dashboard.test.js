@@ -1,4 +1,4 @@
-import { createMonthIterable } from './Month';
+import { createMonthIterable } from '../components/Month/Month';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 
