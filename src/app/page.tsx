@@ -1,9 +1,9 @@
-import Dashboard from './dashboard/page';
+import { DailyPlanner } from './components/DailyPlanner';
 
 export default function Home() {
   return (
     <main className="flex flex-col sm:flex-row">
-      <Dashboard />
+      <DailyPlanner />
     </main>
   );
 }

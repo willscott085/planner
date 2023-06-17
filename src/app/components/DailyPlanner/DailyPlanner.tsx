@@ -54,7 +54,7 @@ export function createMonthIterable(
   return matrix;
 }
 
-export default function Dashboard() {
+export function DailyPlanner() {
   const [selectedDate, setSelectedDate] = useState(new Date().toDateString());
   const [formattedDate, setFormattedDate] = useState(
     format(new Date(selectedDate), 'eeee, d LLLL yyyy', { weekStartsOn: 1 })
