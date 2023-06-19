@@ -62,7 +62,7 @@ export function createMonthIterable(
 
 interface Props {
   date: string;
-  items: Array<{ title: string; id: number }>;
+  items: { title: string | null | undefined; id: string }[];
 }
 
 export function DailyPlanner({ date, items }: Props) {
