@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Will-Scott-s-workspace-veusel.eu-west-1.xata.sh/db/whatidid",
+  "codegen": {
+    "output": "src/xata.ts"
+  }
+}
