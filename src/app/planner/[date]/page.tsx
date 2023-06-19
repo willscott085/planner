@@ -1,3 +1,4 @@
+import { DailyPlanner } from '@/app/components/DailyPlanner';
 import { getXataClient } from '@/xata';
 import { add } from 'date-fns';
 
@@ -20,23 +21,10 @@ export default async function Planner({
 }) {
   const { date } = params;
   let dateObj = new Date(valiDate(date));
-
-  if (dateObj.toString() === 'Invalid Date') {
-    dateObj = new Date();
-  }
-
   const nextDay = add(dateObj, { days: 1 });
 
   const page = await xata.db.items
-    .select([
-      'id',
-      'title',
-      'description',
-      'completed',
-      'due',
-      'type',
-      'created',
-    ])
+    .select(['id', 'title', 'created'])
     .filter('created', {
       $ge: dateObj,
       $le: nextDay,
@@ -49,12 +37,10 @@ export default async function Planner({
 
   return (
     <>
-      <div>{date}</div>
-      <ul>
-        {page.records.map(({ id, title }) => (
-          <li key={id}>{title}</li>
-        ))}
-      </ul>
+      <DailyPlanner
+        date={date}
+        items={page.records.map(({ title, id }) => ({ title, id }))}
+      />
     </>
   );
 }

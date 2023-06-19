@@ -12,6 +12,8 @@ import sub from 'date-fns/sub';
 import { Fragment, useEffect, useState } from 'react';
 import { ChevronLeft } from '../icons/ChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
+import isThisMonth from 'date-fns/isThisMonth';
+import Link from 'next/link';
 
 type DayOptions = {
   dateString: string;
@@ -48,7 +50,7 @@ export function createMonthIterable(
       matrix[currentRow].push([
         day,
         {
-          dateString: dateString.toDateString(),
+          dateString: format(dateString, 'yyyy-MM-dd'),
           isToday: isToday(dateString),
           isPadding: getMonth(dateString) !== month,
         },
@@ -58,8 +60,16 @@ export function createMonthIterable(
   return matrix;
 }
 
-export function DailyPlanner() {
-  const [selectedDate, setSelectedDate] = useState(new Date().toDateString());
+interface Props {
+  date: string;
+  items: Array<{ title: string; id: number }>;
+}
+
+export function DailyPlanner({ date, items }: Props) {
+  const [selectedDate, setSelectedDate] = useState(
+    new Date(date).toDateString()
+  );
+  const isCurrentMonth = isThisMonth(new Date(selectedDate));
   const [formattedDay, setFormattedDay] = useState(
     format(new Date(selectedDate), 'eeee')
   );
@@ -71,17 +81,13 @@ export function DailyPlanner() {
     new Date(selectedDate).getMonth()
   );
 
-  const handleDayClick = (dateString: string) => {
-    setSelectedDate(new Date(dateString).toDateString());
-  };
+  const nextMonthDateString = () =>
+    format(add(new Date(selectedDate), { months: 1 }), 'yyyy-MM-dd');
 
-  const handleNextDayClick = () => {
-    setSelectedDate((ds) => add(new Date(ds), { days: 1 }).toDateString());
-  };
+  const previousMonthDateString = () =>
+    format(sub(new Date(selectedDate), { months: 1 }), 'yyyy-MM-dd');
 
-  const handlePreviousDayClick = () => {
-    setSelectedDate((ds) => sub(new Date(ds), { days: 1 }).toDateString());
-  };
+  const todayDateString = () => format(new Date(), 'yyyy-MM-dd');
 
   const handlePlannerKeyDown = (evt: KeyboardEvent) => {
     if (evt.key === 'ArrowUp') {
@@ -135,23 +141,36 @@ export function DailyPlanner() {
     <main className="flex flex-col sm:flex-row">
       <section className="flex-grow">
         <h1 className="py-4">{formattedDay}</h1>
+        <ul>
+          {items.map(({ id, title }) => (
+            <li key={id}>{title}</li>
+          ))}
+        </ul>
       </section>
       <section className="w-full max-w-md">
         <div className="flex justify-between items-center">
           <h2 className="py-4">{formattedMonthYear}</h2>
+          {!isCurrentMonth && (
+            <Link
+              className="text-xs py-1 px-2 shadow-2 rounded-xl"
+              href={`/planner/${todayDateString()}`}
+            >
+              Today
+            </Link>
+          )}
           <div className="flex justify-between gap-4">
-            <button
-              onClick={handlePreviousDayClick}
+            <Link
+              href={`/planner/${previousMonthDateString()}`}
               className="hover:shadow-2 rounded-full p-3"
             >
               <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              onClick={handleNextDayClick}
+            </Link>
+            <Link
+              href={`/planner/${nextMonthDateString()}`}
               className="hover:shadow-2 rounded-full p-3"
             >
               <ChevronRight className="h-5 w-5" />
-            </button>
+            </Link>
           </div>
         </div>
         <div className="grid grid-cols-7">
@@ -164,7 +183,6 @@ export function DailyPlanner() {
                   isToday={opts.isToday}
                   isSelected={isSelected(opts.dateString)}
                   dateString={opts.dateString}
-                  onDayClick={handleDayClick}
                 >
                   {day}
                 </Day>

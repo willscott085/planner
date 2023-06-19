@@ -1,6 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
+import Link from 'next/link';
 import React from 'react';
 
 interface Props {
@@ -8,16 +9,14 @@ interface Props {
   dateString: string;
   isToday: boolean;
   isSelected: boolean;
-  onDayClick: (dateString: string) => void;
   children: React.ReactNode;
 }
 
 function Day(props: Props) {
-  const { isPadding, isToday, isSelected, dateString, onDayClick, children } =
-    props;
+  const { isPadding, isToday, isSelected, dateString, children } = props;
 
   return (
-    <button
+    <Link
       className={clsx(
         'flex rounded-full justify-center items-center transition-colors ease-in duration-250 aspect-square hover:shadow-2',
         {
@@ -26,10 +25,10 @@ function Day(props: Props) {
           'bg-neutral-400': isSelected && !isToday,
         }
       )}
-      onClick={() => onDayClick(dateString)}
+      href={`/planner/${dateString}`}
     >
       {children}
-    </button>
+    </Link>
   );
 }
 
