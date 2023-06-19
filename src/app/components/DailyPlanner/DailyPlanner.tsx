@@ -1,17 +1,15 @@
 'use client';
 
+import { Day } from '@/app/components/Day';
+import add from 'date-fns/add';
 import addDays from 'date-fns/addDays';
+import format from 'date-fns/format';
 import getMonth from 'date-fns/getMonth';
+import getWeek from 'date-fns/getWeek';
 import isToday from 'date-fns/isToday';
 import startOfWeek from 'date-fns/startOfWeek';
-import format from 'date-fns/format';
-import React, { useEffect, useState } from 'react';
-import { Day } from '@/app/components/Day';
-import { Fragment } from 'react';
-import getWeek from 'date-fns/getWeek';
-import parse from 'date-fns/parse';
-import add from 'date-fns/add';
 import sub from 'date-fns/sub';
+import { Fragment, useEffect, useState } from 'react';
 import { ChevronLeft } from '../icons/ChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
 

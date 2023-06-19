@@ -27,7 +27,9 @@
 				"bradlc.vscode-tailwindcss",
 				"esbenp.prettier-vscode",
 				"planbcoding.vscode-react-refactor",
-				"bierner.folder-source-actions"
+				"bierner.folder-source-actions",
+				"github.vscode-github-actions",
+				"ms-azuretools.vscode-docker"
 			]
 		}
 	}
