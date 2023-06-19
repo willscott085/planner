@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 function createDateString(dateString?: string) {
-  const date = dateString ? new Date(dateString) : new Date();
+  const isValidDateString = /^\d{4}(?:-|\/)\d{1,2}(?:-|\/)\d{1,2}$/.test(
+    dateString!
+  );
+  const date =
+    dateString && isValidDateString ? new Date(dateString) : new Date();
   let month = '' + (date.getMonth() + 1);
   let day = '' + date.getDate();
   let year = date.getFullYear();
