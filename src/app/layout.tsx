@@ -5,8 +5,8 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Plan me, baby!',
-  description: 'The mother of all planner apps',
+  title: 'The planner for devs',
+  description: 'A simple little planning tools for software developers˝',
 };
 
 export default function RootLayout({

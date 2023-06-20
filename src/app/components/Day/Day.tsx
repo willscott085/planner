@@ -18,10 +18,11 @@ function Day(props: Props) {
   return (
     <Link
       className={clsx(
-        'flex rounded-full justify-center items-center transition-colors ease-in duration-250 aspect-square hover:bg-neutral-400',
+        'flex rounded-full justify-center items-center transition-colors ease-in duration-250 aspect-square',
         {
           'text-neutral-500': isPadding,
           'bg-blue-600': isToday,
+          'hover:bg-neutral-400': !isToday,
           'shadow-2': isSelected,
         }
       )}

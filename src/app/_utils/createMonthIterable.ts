@@ -12,12 +12,31 @@ type DayOptions = {
 
 export type DayT = [number, DayOptions];
 
+const hashMap = new Map();
+
 export function createMonthIterable(
   year: number,
   month: number,
   weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 1
 ) {
-  console.log('create');
+  if (hashMap.has(`${year}-${month}`)) {
+    console.log('cache hit on ', `${year}-${month}`);
+    return hashMap.get(`${year}-${month}`);
+  }
+
+  if (hashMap.size >= 100) {
+    console.log(
+      'cache clear =========================================DDDDDDDD'
+    );
+
+    hashMap.clear();
+  }
+
+  console.log(
+    'new calculation --------------------------------------------- XXXXXX',
+    hashMap.size
+  );
+
   const startDate = startOfWeek(new Date(year, month, 1), { weekStartsOn });
   const rows = 6;
   const cols = 7;
@@ -46,6 +65,8 @@ export function createMonthIterable(
         },
       ]);
     });
+
+  hashMap.set(`${year}-${month}`, matrix);
 
   return matrix;
 }

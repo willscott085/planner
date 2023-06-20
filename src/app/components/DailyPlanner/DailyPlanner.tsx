@@ -1,27 +1,23 @@
 'use client';
 
-import { createMonthIterable } from '@/app/_utils/createMonthIterable';
-import { createDateHelper } from '@/app/_utils/dateHelpers';
+import { createDateHelper, createMonthIterable } from '@/app/_utils';
 import { Day } from '@/app/components/Day';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { ChevronLeft } from '../icons/ChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
+import { DayT } from '@/app/_utils/createMonthIterable';
 
 interface Props {
   date: string;
   items: { title: string | null | undefined; id: string }[];
+  monthIterable: DayT[][];
 }
 
-export function DailyPlanner({ date, items }: Props) {
+export function DailyPlanner({ date, items, monthIterable }: Props) {
   const router = useRouter();
   const [dateHelper, setDateHelper] = useState(createDateHelper(date));
-
-  const monthIterable = createMonthIterable(
-    dateHelper.selectedYear,
-    dateHelper.selectedMonth
-  );
 
   useEffect(() => {
     if (date) {
@@ -47,7 +43,7 @@ export function DailyPlanner({ date, items }: Props) {
     return () => {
       document.removeEventListener('keydown', handlePlannerKeyDown);
     };
-  }, []);
+  }, [dateHelper, router]);
 
   return (
     <main className="flex flex-col sm:flex-row">
@@ -59,7 +55,7 @@ export function DailyPlanner({ date, items }: Props) {
           ))}
         </ul>
       </section>
-      <section className="w-full max-w-md">
+      <section className="w-full max-w-sm">
         <div className="flex justify-between items-center">
           <h2 className="py-4">{dateHelper.shortMonthYearStr}</h2>
           {!dateHelper.isCurrentMonth && (
@@ -85,7 +81,7 @@ export function DailyPlanner({ date, items }: Props) {
             </Link>
           </div>
         </div>
-        <div className="grid grid-cols-7 gap-3">
+        <div className="grid grid-cols-7 gap-2">
           {monthIterable.map((week, idx) => (
             <Fragment key={idx}>
               {week.map(([day, opts]) => (

@@ -1,23 +1,18 @@
+import { createMonthIterable } from '@/app/_utils';
 import { DailyPlanner } from '@/app/components/DailyPlanner';
 import { getXataClient } from '@/xata';
 import { add } from 'date-fns';
+import React from 'react';
 
 const xata = getXataClient();
 
-const valiDate = (dateString: string = '') => {
-  if (typeof dateString !== 'string') return '';
-
-  const [year, month, day] = dateString.split('-');
-
-  if (!year || !month || !day) return '';
-
-  return dateString;
-};
-
 export default async function Day({ params }: { params: { date: string } }) {
   const { date } = params;
-  let dateObj = new Date(valiDate(date));
+  let dateObj = new Date(date);
   const nextDay = add(dateObj, { days: 1 });
+  const year = dateObj.getFullYear();
+  const month = dateObj.getMonth();
+  const monthIterable = createMonthIterable(year, month);
 
   const page = await xata.db.items
     .select(['id', 'title', 'created'])
@@ -36,6 +31,7 @@ export default async function Day({ params }: { params: { date: string } }) {
       <DailyPlanner
         date={date}
         items={page.records.map(({ title, id }) => ({ title, id }))}
+        monthIterable={monthIterable}
       />
     </>
   );
