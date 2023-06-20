@@ -14,11 +14,7 @@ const valiDate = (dateString: string = '') => {
   return dateString;
 };
 
-export default async function Planner({
-  params,
-}: {
-  params: { date: string };
-}) {
+export default async function Day({ params }: { params: { date: string } }) {
   const { date } = params;
   let dateObj = new Date(valiDate(date));
   const nextDay = add(dateObj, { days: 1 });

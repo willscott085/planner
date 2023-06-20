@@ -1,64 +1,13 @@
 'use client';
 
+import { createMonthIterable } from '@/app/_utils/createMonthIterable';
+import { createDateHelper } from '@/app/_utils/dateHelpers';
 import { Day } from '@/app/components/Day';
-import add from 'date-fns/add';
-import addDays from 'date-fns/addDays';
-import format from 'date-fns/format';
-import getMonth from 'date-fns/getMonth';
-import getWeek from 'date-fns/getWeek';
-import isToday from 'date-fns/isToday';
-import startOfWeek from 'date-fns/startOfWeek';
-import sub from 'date-fns/sub';
-import { Fragment, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { ChevronLeft } from '../icons/ChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
-import isThisMonth from 'date-fns/isThisMonth';
-import Link from 'next/link';
-
-type DayOptions = {
-  dateString: string;
-  isToday: boolean;
-  isPadding: boolean;
-};
-
-type Day = [number, DayOptions];
-
-export function createMonthIterable(
-  year: number,
-  month: number,
-  weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 1
-) {
-  const startDate = startOfWeek(new Date(year, month, 1), { weekStartsOn });
-  const rows = 6;
-  const cols = 7;
-  const length = rows * cols;
-  let currentRow = 0;
-  let currentCol = 0;
-  const matrix: Day[][] = Array.from({ length: rows }).map((_) => []);
-
-  Array.from({ length })
-    .map((_, index) => addDays(startDate, index))
-    .forEach((dateString, index) => {
-      const day = dateString.getDate();
-
-      if (index !== 0 && index % cols <= 0) {
-        currentRow++;
-      }
-
-      currentCol = index - currentRow * cols;
-
-      matrix[currentRow].push([
-        day,
-        {
-          dateString: format(dateString, 'yyyy-MM-dd'),
-          isToday: isToday(dateString),
-          isPadding: getMonth(dateString) !== month,
-        },
-      ]);
-    });
-
-  return matrix;
-}
 
 interface Props {
   date: string;
@@ -66,70 +15,33 @@ interface Props {
 }
 
 export function DailyPlanner({ date, items }: Props) {
-  const [selectedDate, setSelectedDate] = useState(
-    new Date(date).toDateString()
-  );
-  const isCurrentMonth = isThisMonth(new Date(selectedDate));
-  const [formattedDay, setFormattedDay] = useState(
-    format(new Date(selectedDate), 'eeee')
-  );
-  const [formattedMonthYear, setFormattedMonthYear] = useState(
-    format(new Date(selectedDate), 'MM yyyy')
-  );
+  const router = useRouter();
+  const [dateHelper, setDateHelper] = useState(createDateHelper(date));
+
   const monthIterable = createMonthIterable(
-    new Date(selectedDate).getFullYear(),
-    new Date(selectedDate).getMonth()
+    dateHelper.selectedYear,
+    dateHelper.selectedMonth
   );
 
-  const nextMonthDateString = () =>
-    format(add(new Date(selectedDate), { months: 1 }), 'yyyy-MM-dd');
-
-  const previousMonthDateString = () =>
-    format(sub(new Date(selectedDate), { months: 1 }), 'yyyy-MM-dd');
-
-  const todayDateString = () => format(new Date(), 'yyyy-MM-dd');
-
-  const handlePlannerKeyDown = (evt: KeyboardEvent) => {
-    if (evt.key === 'ArrowUp') {
-      setSelectedDate((ds) => sub(new Date(ds), { days: 7 }).toDateString());
-    } else if (evt.key === 'ArrowRight') {
-      setSelectedDate((ds) => add(new Date(ds), { days: 1 }).toDateString());
-    } else if (evt.key === 'ArrowDown') {
-      setSelectedDate((ds) => add(new Date(ds), { days: 7 }).toDateString());
-    } else if (evt.key === 'ArrowLeft') {
-      setSelectedDate((ds) => sub(new Date(ds), { days: 1 }).toDateString());
+  useEffect(() => {
+    if (date) {
+      setDateHelper(createDateHelper(date));
     }
-  };
-
-  const isSelected = (dateString: string) => {
-    return dateString === selectedDate;
-  };
+  }, [date]);
 
   useEffect(() => {
-    if (selectedDate) {
-      const selectedWeekNumber = getWeek(new Date(selectedDate), {
-        weekStartsOn: 1,
-      });
-      const currentWeekNumber = getWeek(new Date(), { weekStartsOn: 1 });
-      const isCurrentWeek = selectedWeekNumber === currentWeekNumber;
-      const isPreviousWeek = currentWeekNumber - 1 === selectedWeekNumber;
-      const isNextWeek = currentWeekNumber + 1 === selectedWeekNumber;
-
-      if (isCurrentWeek) {
-        setFormattedDay(format(new Date(selectedDate), 'eeee'));
-      } else if (isPreviousWeek) {
-        setFormattedDay('Last Week ' + format(new Date(selectedDate), 'eeee'));
-      } else if (isNextWeek) {
-        setFormattedDay('Next ' + format(new Date(selectedDate), 'eeee'));
-      } else {
-        setFormattedDay(format(new Date(selectedDate), 'eeee, d LLLL yyyy'));
+    const handlePlannerKeyDown = (evt: KeyboardEvent) => {
+      if (evt.key === 'ArrowUp') {
+        router.push('/planner/' + dateHelper.subDays(7));
+      } else if (evt.key === 'ArrowRight') {
+        router.push('/planner/' + dateHelper.addDays(1));
+      } else if (evt.key === 'ArrowDown') {
+        router.push('/planner/' + dateHelper.addDays(7));
+      } else if (evt.key === 'ArrowLeft') {
+        router.push('/planner/' + dateHelper.subDays(1));
       }
+    };
 
-      setFormattedMonthYear(format(new Date(selectedDate), 'MMMM, yyyy'));
-    }
-  }, [selectedDate]);
-
-  useEffect(() => {
     document.addEventListener('keydown', handlePlannerKeyDown);
 
     return () => {
@@ -140,7 +52,7 @@ export function DailyPlanner({ date, items }: Props) {
   return (
     <main className="flex flex-col sm:flex-row">
       <section className="flex-grow">
-        <h1 className="py-4">{formattedDay}</h1>
+        <h1 className="py-4">{dateHelper.plannerTitle}</h1>
         <ul>
           {items.map(({ id, title }) => (
             <li key={id}>{title}</li>
@@ -149,31 +61,31 @@ export function DailyPlanner({ date, items }: Props) {
       </section>
       <section className="w-full max-w-md">
         <div className="flex justify-between items-center">
-          <h2 className="py-4">{formattedMonthYear}</h2>
-          {!isCurrentMonth && (
+          <h2 className="py-4">{dateHelper.shortMonthYearStr}</h2>
+          {!dateHelper.isCurrentMonth && (
             <Link
               className="text-xs py-1 px-2 shadow-2 rounded-xl"
-              href={`/planner/${todayDateString()}`}
+              href={`/planner/${dateHelper.todayStr}`}
             >
               Today
             </Link>
           )}
           <div className="flex justify-between gap-4">
             <Link
-              href={`/planner/${previousMonthDateString()}`}
+              href={`/planner/${dateHelper.previousMonthStr}`}
               className="hover:shadow-2 rounded-full p-3"
             >
               <ChevronLeft className="h-5 w-5" />
             </Link>
             <Link
-              href={`/planner/${nextMonthDateString()}`}
+              href={`/planner/${dateHelper.nextMonthStr}`}
               className="hover:shadow-2 rounded-full p-3"
             >
               <ChevronRight className="h-5 w-5" />
             </Link>
           </div>
         </div>
-        <div className="grid grid-cols-7">
+        <div className="grid grid-cols-7 gap-3">
           {monthIterable.map((week, idx) => (
             <Fragment key={idx}>
               {week.map(([day, opts]) => (
@@ -181,7 +93,7 @@ export function DailyPlanner({ date, items }: Props) {
                   key={day}
                   isPadding={opts.isPadding}
                   isToday={opts.isToday}
-                  isSelected={isSelected(opts.dateString)}
+                  isSelected={dateHelper.isDaySelected(opts.dateString)}
                   dateString={opts.dateString}
                 >
                   {day}

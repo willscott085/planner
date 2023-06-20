@@ -18,11 +18,11 @@ function Day(props: Props) {
   return (
     <Link
       className={clsx(
-        'flex rounded-full justify-center items-center transition-colors ease-in duration-250 aspect-square hover:shadow-2',
+        'flex rounded-full justify-center items-center transition-colors ease-in duration-250 aspect-square hover:bg-neutral-400',
         {
           'text-neutral-500': isPadding,
           'bg-blue-600': isToday,
-          'bg-neutral-400': isSelected && !isToday,
+          'shadow-2': isSelected,
         }
       )}
       href={`/planner/${dateString}`}
